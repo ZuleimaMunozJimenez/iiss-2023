@@ -41,7 +41,7 @@ import java.util.*;
   }
 
 }
-```
+```js
 
 La clase consta de 3 variables declaradas como privadas : `titulo`, `autor` y `numPaginas`. Las cuales almacenarán la información de un libro.
 Además, la clase consta de un método constructor parametrizado, 3 métodos públicos con los que acceder a las variables de la clase y un método público que imprimirá por
@@ -62,7 +62,7 @@ public static void main(String[] args)
   miLibro.imprimirInfo(); // "El gran Gatsby" de F. Scott Fitzgerald, 180 páginas
 }
 }
-```
+```js
 
 El siguiente código nos dirá que hay un error porque no puede acceder a titulo. Pero en cambio, si comentamos esa línea y ejecutamos lo demás, podemos ver el contenido
 de la clase.
