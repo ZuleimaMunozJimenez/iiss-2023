@@ -100,4 +100,4 @@ public class Main {
 El resultado de ejecutar este código de prueba es el que se muestra en la imagen.
 
 
-            ![Resultado de la ejecución del ejemplo](imagen.png "Resultado main")
+![Resultado de la ejecución del ejemplo](imagen.png "Resultado main")
