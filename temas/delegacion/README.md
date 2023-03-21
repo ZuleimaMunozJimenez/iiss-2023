@@ -1,5 +1,10 @@
 # Delegación en Java
 
+En la realización de un ejemplo de delegación he hecho una clase _Libro_ y una clase _Libreria_. La clase _Libro_ tiene las propiedades de este que son `titulo`, `autor` y `precio`. En cambio la clase _Libreria_ contiene una lista de libros. Con esto hacemos uso de la delegación, ya que asigna la responsabilidad de mantener la información de cada libro a la clase _Libro_.
+
+
+La clase _Libreria_ contiene los métodos **agregarLibro** y **eliminarLibro** que realizan dichas funcionalidades recibiendo una instancia de Libro como parámetro. Además contiene el método **mostrarLibros** que es un bucle que recorre la lista y muestra la información de cada libro utilizando los métodos **getTitulo**, **getAutor** y **getPrecio** de la clase _Libro_.
+
 
 ## Implementación
 
