@@ -5,7 +5,7 @@ class Libro:
         self.numPaginas = numPaginas
 
     def imprimir(self):
-        print(f"{self.titulo} by {self.autor}, {self.numPaginas} numPaginas")
+        print(f"El título es: {self.titulo}\nEscrito por: {self.autor}\nCuenta con un total de {self.numPaginas} páginas\n")
 
 class Novela(Libro):
     def __init__(self, titulo, autor, numPaginas, genero):
