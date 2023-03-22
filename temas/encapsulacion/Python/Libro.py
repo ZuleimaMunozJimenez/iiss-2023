@@ -15,3 +15,16 @@ class Libro:
 
     def set_precio(self, precio):
         self.__precio = precio
+
+# Crear un objeto de libro
+libro1 = Libro("Antes de Diciembre", "Joana Marcús", 20)
+
+# Obtener el título y el autor del libro (uso de método get)
+print("Título del libro:", libro1.get_titulo())
+print("Autor del libro:", libro1.get_autor())
+
+# Actualizar el precio del libro (uso de método set)
+libro1.set_precio(25)
+
+# Obtener el nuevo precio del libro (uso de método get)
+print("Precio del libro:", libro1.get_precio())
