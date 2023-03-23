@@ -35,7 +35,7 @@ class LibroRomance(titulo: String, autor: String, val genero: String) extends Li
 ```
 
 
-##Subclase LibroClasificado
+### Subclase LibroClasificado
 ```scala
 class LibroClasificado(titulo: String, autor: String, val edad: String) extends Libro(titulo, autor) {
   override def leer(): Unit = {
