@@ -53,4 +53,10 @@ librosOrdenados.foreach(println)
 ```
 
 
+Como he dicho anterioremente he definido una clase `Libro` que tiene tres atributos: `titulo`, `autor` y `paginas`. Luego, he creado la lista con 5 libros y su información.
+Después he definido la función `ordenarPor` que toma una lista de libros y una función de comparación como argumentos. La función `ordenarPor` llama al método `sortWith` de la lista de libros, ordena la lista utilizando la función de comparación que se le pasa.
+
+
+Posteriormente, en el Main, defino una función de comparación que compara los libros por número de páginas. Finalmente, llamo a la función `ordenarPor` con la lista de libros y la función de comparación, y asigno el resultado a la variable `librosOrdenados`. Luego imprimo cada libro ordenado usando el método `foreach`. Y obtengo como resultado lo siguiente:
+
 ![Resultado de la ejecución del ejemplo](imagen.png "Resultado")
