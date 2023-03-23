@@ -49,7 +49,7 @@ object Main extends App {
   libro.modtitulo_=(libro, "ADD")
   libro.autor = "Joana Marcús"
   libro.editorial = "Penguin House"
-  println(libro) // Antes de diciembre, Joana Marcús, Penguin House
+  println(libro) // ADD, Joana Marcús, Penguin House
 }
 ```
 
