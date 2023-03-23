@@ -4,9 +4,11 @@ class Libro(private var _titulo: String, private var _autor: String, private var
   def autor: String = _autor
   def editorial: String = _editorial
 
-  def titulo_=(nuevoTitulo: String): Unit = {
+  private def titulo_=(nuevoTitulo: String): Unit = {
     _titulo = nuevoTitulo
   }
+
+  def modtitulo_=(lib: Libro, tit: String): Unit = { lib.titulo = tit}
 
   def autor_=(nuevoAutor: String): Unit = {
     _autor = nuevoAutor
