@@ -1,0 +1,8 @@
+com\example\Library.class
+com\example\LibraryApp.class
+com\example\Author.class
+com\example\Main.class
+com\example\BookServiceImpl.class
+com\example\BookService.class
+com\example\Book.class
+com\example\LibraryModule.class
