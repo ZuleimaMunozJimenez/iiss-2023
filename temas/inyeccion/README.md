@@ -1,104 +1,59 @@
-# Inyección en Java usando Google Guice
+# Ejemplo de Aplicación de Biblioteca usando Inyección de Dependencias con Guice
 
-Google Guice es una librería java de Google que implementa un estandar de inyección de dependencias JSR-330. Podemos utilizarlo paa tener clases Java independientes entre
-sí, teniendo mediante el patrón DI un diseño más extensible, mantenible y fácil de testear.
+Este ejemplo es una aplicación de biblioteca simple que utiliza el marco de inyección de dependencias Guice. La aplicación muestra cómo configurar la inyección de dependencias con Guice y cómo utilizarlo en una aplicación Java.
 
-## Implementación
+## Estructura del Proyecto
 
-### LectorDatosClientes.java
+El proyecto tiene la siguiente estructura:
 
-```java
-package es.jpascu.ioc.googleguice.services;
-
-import com.google.inject.Inject;
-
-public class LectorDatosClientes {
-
- private IClienteDao clientesDao;
-
- @Inject
- public void setClientesDao(IClienteDao clientesDao) {
-  this.clientesDao = clientesDao;
- }
-
- public void escribirDatosCliente(String id) {
-  clientesDao.leerClienteDao(id);
- }
-}
+```css
+library-app/
+|- src/
+| |- main/
+| | |- java/
+| | | |- com/
+| | | | |- example/
+| | | | | |- Book.java
+| | | | | |- Author.java
+| | | | | |- Library.java
+| | | | | |- BookService.java
+| | | | | |- BookServiceImpl.java
+| | | | | |- LibraryModule.java
+| | | | | |- LibraryApp.java
+| | |- resources/
+|- target/
+|- pom.xml
 ```
+- La carpeta `src/main/java/com/example` contiene las clases Java que forman parte de la aplicación.
+- La clase `Book` representa un libro en la biblioteca y tiene propiedades como título, autor y año de publicación.
+- La clase `Author` representa un autor de libros y tiene propiedades como nombre y nacionalidad.
+- La clase `Library` representa la biblioteca y tiene métodos para agregar y buscar libros.
+- La interfaz `BookService` define los métodos para agregar y buscar libros en la biblioteca.
+- La clase `BookServiceImpl` es una implementación concreta de `BookService` que realiza las operaciones en la biblioteca.
+- La clase `LibraryModule` es un módulo de Guice que define las dependencias y las configura.
+- La clase `LibraryApp` es la clase principal de la aplicación que configura la inyección de dependencias y ejecuta la aplicación.
 
+## Requisitos previos
 
-Cabe destacar que usamos la anotación Inject.
+Para ejecutar este ejemplo, debemos asegurarnos de tener instalados los siguientes requisitos:
 
-### IClienteCAo.java
-```java
-package es.jpascu.ioc.googleguice.services;
+- Java Development Kit (JDK) versión 8 o superior.
+- Apache Maven.
 
-public interface IClienteDao {
+## Cómo ejecutar el ejemplo
 
- public void leerClienteDao(String id);
-}
-```
+Sigue los pasos a continuación para ejecutar el ejemplo:
 
-### ClienteDaoJdbc.java
+1. Abre una terminal o línea de comandos y navega hasta el directorio raíz del proyecto `library-app`.
 
-```java
-package es.jpascu.ioc.googleguice.services;
+2. Ejecuta el siguiente comando para compilar el proyecto y generar el archivo JAR:
+```mvn clean package```
 
-public class ClienteDaoJdbc implements IClienteDao {
+Este comando compilará el proyecto, ejecutará las pruebas y generará el archivo JAR en la carpeta `target`.
 
- @Override
- public void leerClienteDao(String id) {
-  System.out.println("Datos de cliente: " + id);
- }
+3. Una vez que se haya generado el archivo JAR, puedes ejecutar la aplicación con el siguiente comando:
+```java -jar target/library-app-1.0.0.jar```
 
-}
-```
+Esto ejecutará la aplicación de biblioteca y mostrará los resultados en la consola.
 
-
-Ahora para finalizar, desde la clase donde queramos utilizar LectorDatosClientes debemos incluir la lógica para crear dicha clase y sus dependencias mediante 
-`com.google.inject.Injector`.
-
-
-### TestGoogleGuice.java
-```java
-package es.jpascu.ioc.test;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
-import es.jpascu.ioc.googleguice.services.ClienteDaoJdbc;
-import es.jpascu.ioc.googleguice.services.IClienteDao;
-import es.jpascu.ioc.googleguice.services.LectorDatosClientes;
-
-public class TestGoogleGuice {
- public static void main(String args[]) {
-  Injector injector = Guice.createInjector(new JdbcInjectionModule());
-  LectorDatosClientes lectorClientes = injector
-    .getInstance(LectorDatosClientes.class);
-
-  lectorClientes.escribirDatosCliente("jpascu");
- }
-
- public static class JdbcInjectionModule extends AbstractModule {
-  @Override
-  protected void configure() {
-   bind(IClienteDao.class).to(ClienteDaoJdbc.class);
-  }
-
- }
-}
-```
-
-
-Ahora tenemos una clase interna que es una subclasde de la AbstractModule, encargada del _binding_ de una interfaz con una implementación concreta. Para ello se debe
-implementar el método configure.
-
-
-Una vez qye hemos creado nuestro JdbcInjectionModule lo pasaremos como parámetro al objeto de la clase `com.google.inject.Guice.Injector`. A través de este objeto 
-obtendremos una instancia singleton de nuestro LectorDatosClientes con la dependencia correctamente asociada.
-
-
-#### Referencia
-[Ejemplo de inyección de dependencias. Spring y Google Guice.](http://jpascu.blogspot.com/2013/02/inyeccion-de-dependencias-spring-y.html)
+Con esto ya hemos realizado y ejecutado con éxito la aplicación de biblioteca utilizando inyección de dependencias con Guice.
