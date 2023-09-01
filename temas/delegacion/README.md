@@ -111,7 +111,7 @@ scala EjemploDelegacionLibros
 
 Después de ejecutar el programa, el resultado esperado en la consola es:
 ```bash
-Precio total con descuento por cantidad: $90.0
+Precio total con descuento por cantidad: $72.0
 Precio total con descuento por precio total: $81.0
 ```
 
