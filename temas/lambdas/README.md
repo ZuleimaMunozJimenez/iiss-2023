@@ -139,14 +139,11 @@ Para ejecutar este código desde terminal, los pasos a seguir son:
 1. Asegurarse de tener Ruby instalado en el sistema.
 2. Tener los archivos `.rb` en el mismo directorio.
 3. Abrir una terminal que apunte al directorio que contiene los archivos.
-4. Ejecutar el siguiente comando para compilar el código
+4. Ejecutar el siguiente comando para ejecutar el código
 ```bash
-scalac Main.scala
+ruby main.rb
 ```
-5. Una vez compilado con éxito, puedes ejecutar el programa Scala con el comando:
-```bash
-scala Main
-```
+
 
 #### Resultado Esperado
 
