@@ -1,122 +1,159 @@
-# Ejemplo de Uso de Delegación en Scala
+# Ejemplo de uso de Delegación en Go
 
-Este ejemplo tiene como objetivo demostrar el concepto de delegación en Scala a través de una implementación sencilla. Se utiliza una jerarquía de clases y objetos para calcular el precio total con descuento de una lista de libros utilizando diferentes políticas de descuento.
+En primer lugar, para aquel que no conozca el lenguaje de programación Go (también conocido como Golang), se trata de un lenguaje de programación desarrollado por Google. Se ha vuelto popular en el desarrollo de sistemas distribuidos, herramientas de infraestructura y aplicaciones de gran escala. Yo especialemente no conocía este lenguaje, por lo que me ha parecido interesante usarlo para realizar este ejemplo.
+
+
+En Go, la delegación se implementa mediante la composición de tipos. Go no tiene clases en el sentido tradicionale, pero pueden crearse estructuras que incluyan campos de otros tipos y así podemos lograr implementar la delegación.
+
+
+El siguiente ejemplo se basa en un sistema de gestión de biblioteca y queremos modelar diferentes tipos de libros (físicos y electrónicos). Además queremos implementar funciones de registro y seguimiento para ambos tipos de libros.
 
 
 ## Implementación
 
-### Libro.scala
+### library.go
+```go
+package main
 
-```scala
-case class Libro(titulo: String, autor: String, precio: Double)
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
+// Define una estructura base para un libro con información común.
+type Book struct {
+	Title  string
+	Author string
+}
+
+// Define una interfaz para la funcionalidad común de un libro.
+type BookOperations interface {
+	GetDetails() string
+}
+
+// Define una estructura para libros físicos que delega en la estructura base Book.
+type PhysicalBook struct {
+	Book
+	IsAvailable bool
+}
+
+// Implementa la interfaz BookOperations para libros físicos.
+func (pb PhysicalBook) GetDetails() string {
+	availability := "disponible"
+	if !pb.IsAvailable {
+		availability = "no disponible"
+	}
+	return fmt.Sprintf("%s by %s (%s)", pb.Title, pb.Author, availability)
+}
+
+// Define una estructura para libros electrónicos que también delega en la estructura base Book.
+type EBook struct {
+	Book
+	Format string
+}
+
+// Implementa la interfaz BookOperations para libros electrónicos.
+func (eb EBook) GetDetails() string {
+	return fmt.Sprintf("%s by %s (Formato: %s)", eb.Title, eb.Author, eb.Format)
+}
+
+// Función para registrar un libro y mostrar sus detalles.
+func RegisterAndDisplayDetails(book BookOperations) {
+	fmt.Println("Registrando libro:")
+	fmt.Println(book.GetDetails())
+}
+
+func main() {
+	var books []BookOperations
+
+	// Loop interactivo para que el usuario ingrese detalles de los libros
+	for {
+		fmt.Println("Ingrese los detalles de un libro (Titulo, autor y formato (si es Ebook)) separando con una coma cada campo o escriba 'fin' para finalizar:")
+
+		// Leer entrada del usuario
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		input := scanner.Text()
+
+		// Verificar si el usuario quiere salir del programa
+		if strings.ToLower(input) == "fin" {
+			break
+		}
+
+		// Dividir la entrada en título, autor y formato (si es un libro electrónico)
+		bookDetails := strings.Split(input, ",")
+
+		// Verificar si la entrada es válida
+		if len(bookDetails) < 2 {
+			fmt.Println("Entrada no válida. Debe ingresar al menos título y autor.")
+			continue
+		}
+
+		// Crear un libro físico por defecto
+		var newBook BookOperations = PhysicalBook{
+			Book: Book{
+				Title:  bookDetails[0],
+				Author: bookDetails[1],
+			},
+			IsAvailable: true,
+		}
+
+		// Verificar si se proporcionó el formato para un libro electrónico
+		if len(bookDetails) > 2 {
+			newBook = EBook{
+				Book: Book{
+					Title:  bookDetails[0],
+					Author: bookDetails[1],
+				},
+				Format: bookDetails[2],
+			}
+		}
+
+		// Agregar el libro a la lista
+		books = append(books, newBook)
+	}
+
+	// Registrar y mostrar detalles de los libros
+	fmt.Println("\nDetalles de los libros registrados:")
+	for _, book := range books {
+		RegisterAndDisplayDetails(book)
+	}
+}
+
 ```
 
 
-### EjemploDelegaciónLibros.scala
-```scala
-object EjemploDelegacionLibros {
-  def main(args: Array[String]): Unit = {
-    val libros = List(
-      Libro("El principito", "Antoine de Saint-Exupéry", 15.0),
-      Libro("Cien años de soledad", "Gabriel García Márquez", 20.0),
-      Libro("Don Quijote de la Mancha", "Miguel de Cervantes", 25.0),
-      Libro("1984", "George Orwell", 18.0),
-      Libro("El retrato de Dorian Gray", "Oscar Wilde", 12.0)
-    )
-
-    val compra = new Compra()
-
-    val descuentoPorCantidad = new DescuentoPorCantidad()
-    val descuentoPorPrecioTotal = new DescuentoPorPrecioTotal()
-
-    val precioTotalConDescuento1 = compra.calcularPrecioTotal(libros, descuentoPorCantidad)
-    val precioTotalConDescuento2 = compra.calcularPrecioTotal(libros, descuentoPorPrecioTotal)
-
-    println(s"Precio total con descuento por cantidad: $$${precioTotalConDescuento1}")
-    println(s"Precio total con descuento por precio total: $$${precioTotalConDescuento2}")
-  }
-}
-```
-
-
-* Se crea una lista de libros llamada libros. Cada libro es un objeto de la clase Libro, que tiene tres atributos: `titulo`, `autor`, y `precio`.
-* La lista `libros` contiene información sobre cinco libros diferentes. Esto proporciona datos de entrada para calcular el precio total con descuento.
-* Se crea una instancia de la clase `Compra` llamada `compra`.
-* Se crean dos instancias de clases que heredan de la clase abstracta `PoliticaDescuento`. Estas instancias representan dos políticas de descuento diferentes:
-    * `descuentoPorCantidad` es una instancia de la clase DescuentoPorCantidad.
-    * `descuentoPorPrecioTotal` es una instancia de la clase DescuentoPorPrecioTotal.
-
-* Se llama al método `calcularPrecioTotal` de la instancia `compra` dos veces.
-* La primera llamada calcula el precio total con descuento utilizando la política de descuento representada por `descuentoPorCantidad`.
-* La segunda llamada calcula el precio total con descuento utilizando la política de descuento representada por `descuentoPorPrecioTotal`.
-* Se imprimen los resultados en la consola utilizando println. Los valores se imprimen en formato de cadena, utilizando interpolación de cadenas para mostrar los resultados de manera legible.
-
-
-### PoliticaDescuento.scala
-```scala
-abstract class PoliticaDescuento {
-  def calcularDescuento(libros: List[Libro]): Double
-}
-
-class DescuentoPorCantidad extends PoliticaDescuento {
-  override def calcularDescuento(libros: List[Libro]): Double = {
-    val numLibros = libros.length
-    if (numLibros >= 5) 0.2 else if (numLibros >= 3) 0.1 else 0.0
-  }
-}
-
-class DescuentoPorPrecioTotal extends PoliticaDescuento {
-  override def calcularDescuento(libros: List[Libro]): Double = {
-    val precioTotal = libros.map(_.precio).sum
-    if (precioTotal >= 100) 0.15 else if (precioTotal >= 50) 0.1 else 0.05
-  }
-}
-```
-
-
-* Cada política de descuento implementa su propia lógica de cálculo de descuento, que se basa en la cantidad de libros o en el precio total de los libros.
-
-
-### Compra.scala
-
-```scala
-class Compra {
-  def calcularPrecioTotal(libros: List[Libro], politicaDescuento: PoliticaDescuento): Double = {
-    val descuento = politicaDescuento.calcularDescuento(libros)
-    val precioTotal = libros.map(_.precio).sum
-    precioTotal - (precioTotal * descuento)
-  }
-}
-```
-
-
-* La clase `Compra` tiene la responsabilidad de calcular el precio total con descuento en función de una política de descuento específica.
+* En primer lugar, definimos la estructura base de `Book`. Se define una estructura básica llamada `Book` que tiene campos para el título y el autor del libro.
+* Luego, definimos la interfaz `BookOperations`. Esta representa la funcionalidad común que debe proporcionar cualquier libro. La interfaz exige la implementación de un método `GetDetails()`.
+* Posteriormente, definimos la estructura `PhysicalBook`. Esta estructura delega la estructura `Book`. Además, tiene un campo adicional `IsAvailable` que indica si el libro físico está disponible.
+* A continuación, implementamos `GetDetails` para `PhysicalBook`. Esta implementación devuelve los detalles del libro físico, incluyendo su disponibilidad.
+* Seguimos con la definición de la estructura `EBook`. Esta estructura delega la estructura `Book`. Además, tiene un campo adicional `Format` que indica el formato del libro electrónico.
+* Continuamos con la implementación del `GetDetails` para `EBook`. Esta proporciona detalles específicos para los libros electrónicos.
+* Realizamos ahora la implementación de la función `RegisterAndDisplayDetails`. Esta función toma un tipo que implementa la interfaz `BookOperations` y muestra los detalles del libro.
+* Para finalizar, creamos la función `main`. Recoge libros y muestra su información.
 
 
 ### Ejecución del código
 Para ejecutar este código desde terminal, los pasos a seguir son:
-1. Asegurarse de tener Scala instalado en el sistema.
-2. Tener los archivos `.scala` en el mismo directorio.
+1. Asegurarse de tener Go instalado en el sistema.
+2. Tener el archivo `.go` en el mismo directorio.
 3. Abrir una terminal que apunte al directorio que contiene los archivos.
-4. Ejecutar el siguiente comando para compilar el código
+4. Ejecutar el siguiente comando para ejecutar el código
 ```bash
-scalac EjemploDelegacionLibros.scala
-```
-5. Una vez compilado con éxito, puedes ejecutar el programa Scala con el comando:
-```bash
-scala EjemploDelegacionLibros
+go run library.go
 ```
 
 #### Resultado Esperado
 
-Después de ejecutar el programa, el resultado esperado en la consola es:
-```bash
-Precio total con descuento por cantidad: $72.0
-Precio total con descuento por precio total: $81.0
-```
+El programa presenta un poco de interación con el usuario ya que muestra un mensaje en el que solicita introducir libros al sistema. Cuando estos son introducidos, podemos seguir haciéndolo hasta que escribamos fin. El programa interpreta en función a la información que le estemos introduciendo si es un libro físico o uno electrónico (dependerá de si le introducimos el formato a continuación del autor). Al finalizar, mostrará todos los detalles de todos los libros que hayamos introducido.
+
+
+Si el programa funciona correctamente, mostrará el mensaje: *Ingrese los detalles de un libro (Titulo, autor y formato (si es Ebook)) separando con una coma cada campo o escriba 'fin' para finalizar:*. Lo mostrará en bucle hasta que pongamos la palabra fin. Si metemos la información de forma incorrecta mostrará el mensaje: *Entrada no válida. Debe ingresar al menos título y autor.*. Cuando introduzcamos la palabra fin, mostrará el mensaje: *Detalles de los libros registrados:* y la lista de estos (si no hay ninguno no se mostrará nada a continuación del mensaje).
 
 #### Resultado Obtenido
 
-Efectivamente el resultado obtenido es el mismo al esperado, como podemos observar en la siguiente foto:
+Hacemos una ejecución en el que obtenemos el siguiente resultado (que es variable en función de la interacción de cada usuario):
 
-![Resultado de la ejecución del ejemplo](Imagen.png "Resultado")
+![Resultado de la ejecución del ejemplo](Resultado.png "Resultado")
