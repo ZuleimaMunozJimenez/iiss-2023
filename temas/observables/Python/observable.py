@@ -76,3 +76,4 @@ async_event_system.trigger_event("key", "Tecla Escape")
 
 # Permitir que las nuevas suscripciones tengan tiempo para procesar los eventos
 time.sleep(1)
+
