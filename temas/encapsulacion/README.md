@@ -1,4 +1,4 @@
-# Ejemplo de uso de Encapsulación en 
+# Ejemplo de uso de Encapsulación en Ruby
 
 
 Este ejemplo está basado en la gestión de una biblioteca de libros que interactúa con el usuario a través de un menú. La encapsulación en este ejemplo se encuentra en el uso de métodos de acceso y la organización de la funcionalidad dentro de clases.
