@@ -1,68 +1,114 @@
-# Ejemplo de Anotaciones y Inyección de Dependencias en Java
+# Ejemplo de uso de anotaciones en Python
 
-A continuación, se presenta un ejemplo completo de anotaciones y la inyección de dependencias en Java utilizando el JSR 330. Este ejemplo utiliza Maven como sistema de gestión de proyectos.
 
-## Estructura del Proyecto
+En este ejemplo, desarrollaremos un sistema básico de gestión de bibliotecas en Python utilizando anotaciones de tipo y clases de datos. Utilizaremos las dataclasses de Python para definir las clases Autor y Libro, que representan a un autor y a un libro, respectivamente. Además, crearemos una función llamada buscar_libros_por_autor que permite buscar en una biblioteca los libros escritos por un autor específico.
 
-El proyecto tiene la siguiente estructura:
+A través de este ejemplo, exploraremos cómo las anotaciones de tipo pueden mejorar la claridad y la comprensión del código al proporcionar información sobre los tipos de datos esperados y devueltos. Además, veremos cómo utilizar las clases de datos para organizar la información de manera estructurada en nuestro sistema de gestión de bibliotecas.
 
-```css
-dependency-injection-example
-├── src
-│   └── main
-│       └── java
-│           └── com
-│               └── example
-│                   ├── annotations
-│                   │   ├── Inject.java
-│                   │   ├── Named.java
-│                   │   └── Singleton.java
-│                   ├── di
-│                   │   └── DependencyInjector.java
-│                   ├── repositories
-│                   │   └── UserRepository.java
-│                   ├── services
-│                   │   ├── EmailService.java
-│                   │   └── SMSService.java
-│                   └── Main.java
-└── pom.xml
+
+## Implementación
+
+### anotaciones.py
+```py
+from dataclasses import dataclass
+from typing import List
+
+@dataclass
+class Autor:
+    nombre: str
+    nacionalidad: str
+
+@dataclass
+class Libro:
+    titulo: str
+    autor: Autor
+    anio_publicacion: int
+
+def buscar_libros_por_autor(biblioteca: List[Libro], autor_a_buscar: str) -> List[Libro]:
+    """
+    Busca libros en la biblioteca por el nombre del autor.
+
+    :param biblioteca: Lista de libros en la biblioteca.
+    :type biblioteca: list[Libro]
+    :param autor_a_buscar: Nombre del autor a buscar.
+    :type autor_a_buscar: str
+    :return: Lista de libros escritos por el autor buscado.
+    :rtype: list[Libro]
+    """
+    libros_del_autor = [libro for libro in biblioteca if libro.autor.nombre == autor_a_buscar]
+    return libros_del_autor
+
+# Crear algunos autores y libros
+autor1 = Autor(nombre="Gabriel García Márquez", nacionalidad="Colombiana")
+autor2 = Autor(nombre="J.K. Rowling", nacionalidad="Británica")
+
+libro1 = Libro(titulo="Cien años de soledad", autor=autor1, anio_publicacion=1967)
+libro2 = Libro(titulo="Harry Potter y la piedra filosofal", autor=autor2, anio_publicacion=1997)
+libro3 = Libro(titulo="El otoño del patriarca", autor=autor1, anio_publicacion=1975)
+
+# Crear una biblioteca
+biblioteca = [libro1, libro2, libro3]
+
+# Buscar libros por autor
+autor_buscado = "Gabriel García Márquez"
+libros_del_autor = buscar_libros_por_autor(biblioteca, autor_buscado)
+
+# Imprimir resultados
+print(f"Libros escritos por {autor_buscado}:")
+for libro in libros_del_autor:
+    print(f"- {libro.titulo} ({libro.anio_publicacion})")
+
 ```
 
-El proyecto tiene una estructura simple que contiene los paquetes y clases necesarios.
 
-## Clases y Anotaciones
+El código es un simulacro simple de un sistema de gestión de bibliotecas en Python:
+* **Paso 1: Definición de clases**.
 
-El proyecto consta de las siguientes clases y anotaciones:
+Importamos las bibliotecas necesarias. Creamos la clase `Autor` usando `@dataclass` para definir una clase de datos con dos atributos: `nombre` y `nacionalidad`. Creamos la clase `Libro` también usando `@dataclass`. Un libro tiene un título (`titulo`), un autor (`autor`, que es una instancia de la clase `Autor`), y un año de publicación (`anio_publicacion`).
+* **Paso 2: Definición de funciones**.
 
-1. **Inject**: Es una anotación personalizada que se utiliza para marcar los campos que deben ser inyectados con dependencias.
-2. **Named**: Es una anotación personalizada que se utiliza para especificar un nombre para un componente o dependencia.
-3. **Singleton**: Es una anotación personalizada que se utiliza para marcar un componente como un singleton, es decir, se creará una única instancia y se compartirá en toda la aplicación.
-4. **DependencyInjector**: Es una clase que realiza la inyección de dependencias en tiempo de ejecución. Utiliza reflexión para buscar los campos anotados con `@Inject` y crea las instancias de las dependencias necesarias.
-5. **UserRepository**: Es una clase que representa un repositorio ficticio para usuarios. Tiene un método `saveUser()` que simula guardar un usuario.
-6. **EmailService**: Es una clase que representa un servicio ficticio de envío de correos electrónicos. Tiene un campo `userRepository` anotado con `@Inject` y un método `sendEmail()` que utiliza el repositorio de usuarios para guardar un usuario y enviar el correo electrónico.
-7. **SMSService**: Es una clase que representa un servicio ficticio de envío de mensajes de texto. Tiene un campo `userRepository` anotado con `@Inject` y un método `sendSMS()` que utiliza el repositorio de usuarios para guardar un usuario y enviar el mensaje de texto.
+Definimos una función llamada `buscar_libros_por_autor`. Esta función toma como entrada una lista de libros (`biblioteca`) y el nombre de un autor (`autor_a_buscar`). La función devuelve una lista de libros escritos por el autor buscado.
 
-## Ejecución del Programa
+* **Paso 3: Creación de Objetos y Uso de la Función**.
 
-Sigue los pasos a continuación para ejecutar el ejemplo:
+Creamos instancias de las clases `Autor` y `Libro`. Creamos una lista llamada `biblioteca` que contiene los libros que hemos creado. Llamamos a la función `buscar_libros_por_autor` para encontrar libros escritos por el autor especificado.
 
-1. Abre una terminal o línea de comandos y navega hasta el directorio raíz del proyecto `dependency-injection-example`.
+**Uso de anotaciones**
 
-2. Ejecuta el siguiente comando para compilar el proyecto y generar el archivo JAR:
-```mvn clean package```
+1. Anotaciones en las Clases de Datos:
+Las clases `Autor` y `Libro` están decoradas con `@dataclass` y tienen anotaciones en sus atributos (`nombre`, `nacionalidad`, `titulo`, `autor`, `anio_publicacion`). Estas anotaciones indican los tipos de datos que se esperan para cada atributo.
 
-Este comando compilará el proyecto, ejecutará las pruebas y generará el archivo JAR en la carpeta `target`.
+2. Anotación en la Función `buscar_libros_por_autor`:
+En la firma de la función `buscar_libros_por_autor`, las anotaciones (`List[Libro]`, `str`, `List[Libro]`) indican los tipos de datos esperados y devueltos por la función. Por ejemplo, la lista biblioteca debe contener objetos de tipo `Libro`, y la función devuelve una lista de `Libro`.
 
-3. Una vez que se haya generado el archivo JAR, puedes ejecutar la aplicación con el siguiente comando:
-```java -jar target/dependency-injection-example-1.0.0.jar```
+3. Ejemplo de Creación de Objetos con Anotaciones de Tipo:
+Al crear instancias de las clases `Autor` y `Libro`, las anotaciones de tipo no son necesarias, pero el código muestra cómo se podrían utilizar al proporcionar valores específicos a los atributos.
 
-Esto ejecutará la aplicación de biblioteca y mostrará los resultados en la consola.
+En resumen, las anotaciones en este ejemplo se centran en indicar los tipos de datos para los atributos de las clases de datos y para los parámetros y valores de retorno de la función buscar_libros_por_autor. Estas anotaciones son útiles para proporcionar claridad sobre la estructura del código y facilitar el mantenimiento y la comprensión del mismo.
 
-Cuando se ejecuta el programa, se espera que muestre en la consola lo siguiente:
+### Ejecución del código
+Para ejecutar este código desde terminal, los pasos a seguir son:
+1. Asegurarse de tener Python instalado en el sistema.
+2. Tener el archivo `.py` en el mismo directorio.
+3. Abrir una terminal que apunte al directorio que contiene el archivo.
+4. Ejecutar el siguiente comando para ejecutar el código
+```bash
+python anotaciones.py
 ```
-Saving user...
-Sending email...
-Saving user...
-Sending SMS...
+
+#### Resultado Esperado
+
+
+Al realizar la ejecución del programa el resultado esperado es: 
+```bash
+Libros escritos por Gabriel García Márquez:
+- Cien años de soledad (1967)
+- El otoño del patriarca (1975)
 ```
-Esto indica que se han creado las instancias adecuadas, se han inyectado las dependencias correctamente y se han llamado a los métodos correspondientes.
+
+
+#### Resultado Obtenido
+
+Hacemos una ejecución en el que obtenemos el siguiente resultado (que es variable en función de la interacción de cada usuario):
+
+![Resultado de la ejecución del ejemplo](Resultado.png "Resultado")
