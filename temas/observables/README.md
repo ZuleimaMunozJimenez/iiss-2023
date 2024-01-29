@@ -1,142 +1,180 @@
-# Ejemplo de uso de Observable en Ruby
+# Ejemplo de uso de Observable en Python
 
 
-El patrón Observador es un patrón de diseño de comportamiento que se utiliza cuando un objeto (sujeto) necesita notificar a otros objetos (observadores) sobre un cambio en su estado. Esto permite que múltiples objetos se mantengan informados y reaccionen a los cambios de manera independiente. En el ejemplo proporcionado, implementamos el patrón Observador para gestionar una biblioteca de libros y notificar a los observadores cuando se agregan nuevos libros.
-
-
-El programa simula una biblioteca que permite agregar libros y notificar a los observadores cuando se agrega un libro. Los observadores son dos clases (`Catalog` y `Notifications`) que reaccionan a los cambios en la biblioteca. Cuando se agregan libros, los observadores muestran mensajes en la consola.
-
-
-Este es un ejemplo básico de cómo funciona el patrón Observador en Ruby para notificar a múltiples observadores sobre cambios en un sujeto observable, en este caso, la biblioteca de libros.
+Vamos a hacer un ejemplo que cumple con `Observable = Observador + Iterable`, para ello hemos empleado el lenguaje Python. La biblioteca RxPy no se centra directamente en la iterabilidad, pero si combinamos la funcionalidad de ReactiveX con una lista adicional de observadores podemos conseguirlo.
 
 
 ## Implementación
 
-### book_library.rb
-```ruby
-# book_library.rb
+### observable.py
+```py
+from rx import Observable
+from rx.subject import Subject
+import time
 
-class Book
-  attr_reader :title, :author
+# Definición de la interfaz Observer
+class Observer:
+    def on_next(self, value):
+        pass
 
-  def initialize(title, author)
-    @title = title
-    @author = author
-  end
-end
+    def on_error(self, error):
+        pass
 
-class Library
-  attr_reader :books
+    def on_completed(self):
+        pass
 
-  def initialize
-    @books = []
-    @observers = []
-  end
 
-  def add_observer(observer)
-    @observers << observer
-  end
+# Implementación de Observable
+class AsyncEventSystem:
+    def __init__(self):
+        self._subject = Subject()
+        self._observers = []
 
-  def remove_observer(observer)
-    @observers.delete(observer)
-  end
+    def trigger_event(self, event_type, event_data):
+        print(f"Desencadenando evento de tipo {event_type}")
+        self._subject.on_next((event_type, event_data))
 
-  def add_book(book)
-    @books << book
-    notify_observers(book)
-  end
+    def subscribe(self, observer):
+        self._observers.append(observer)
+        return self._subject.subscribe(observer)
 
-  def notify_observers(book)
-    @observers.each { |observer| observer.update(self, book) }
-  end
-end
+    def observers(self):
+        return iter(self._observers)
+
+
+# Implementación de Observadores
+class ClickEventObserver(Observer):
+    def on_next(self, value):
+        event_type, event_data = value
+        print(f"Manejando evento de clic: {event_data}")
+
+
+class KeyEventObserver(Observer):
+    def on_next(self, value):
+        event_type, event_data = value
+        print(f"Manejando evento de tecla: {event_data}")
+
+
+# Ejemplo de uso
+async_event_system = AsyncEventSystem()
+
+click_observer = ClickEventObserver()
+key_observer = KeyEventObserver()
+
+subscription_click = async_event_system.subscribe(click_observer)
+subscription_key = async_event_system.subscribe(key_observer)
+
+# Desencadenar eventos
+async_event_system.trigger_event("click", "Botón izquierdo")
+async_event_system.trigger_event("key", "Tecla Enter")
+
+# Permitir que las suscripciones tengan tiempo para procesar los eventos
+time.sleep(1)
+
+# Iterar sobre observadores
+print("Iterando sobre observadores:")
+for observer in async_event_system.observers():
+    print(observer)
+
+# Cancelar las suscripciones
+subscription_click.dispose()
+subscription_key.dispose()
+
+# Puedes agregar más eventos después de que las suscripciones han sido canceladas
+async_event_system.trigger_event("click", "Botón derecho")
+async_event_system.trigger_event("key", "Tecla Escape")
+
+# Permitir que las nuevas suscripciones tengan tiempo para procesar los eventos
+time.sleep(1)
 ```
 
 
-* Contiene las definiciones de las clases `Book` y `Library`, así como la lógica principal del programa.
-    * `Book` es una clase que representa un libro con atributos `title` y `author`.
-    * `Library` es una clase que actúa como el sujeto observable. Tiene una lista de libros (`@books`) y una lista de observadores (`@observers`). Puede registrar (`add_observer`) y eliminar (`remove_observer`) observadores, y notificar a los observadores cuando se agrega un libro (`add_book`) llamando al método `notify_observers`.
+* Elementos:
+    * **Clases y Objetos**:
+        1. `Observer` (Observador):
+            * Es una interfaz que define métodos (`on_next`, `on_error`, `on_completed`) que los observadores deben implementar.
+            * En este ejemplo, `ClickEventObserver` y `KeyEventObserver` son las implementaciones concretas de esta interfaz.
+        2. `AsyncEventSystem` (Observable):
+            * Es la clase que actúa como el objeto observable.
+            * Contiene un objeto `Subject` de RxPy, que es una especie de puente entre los observadores y el observable.
+            * Tiene una lista `_observers` que se utiliza para mantener la lista de observadores.
+            * Métodos:
+                * `trigger_event`: Emite un evento a través del `Subject`.
+                * `subscribe`: Permite que un observador se suscriba al observable y lo agrega a la lista de observadores.
+                * `observers`: Devuelve un iterador sobre la lista de observadores.
+    * **Ciclo Principal**:
+        1. Creación de instancias:
+            * Se crea una instancia de `AsyncEventSystem`.
+            * Se crean instancias de `ClickEventObserver` y `KeyEventObserver`.
+        2. Suscripción a Eventos:
+            * Los observadores (`click_observer` y `key_observer`) se suscriben al `AsyncEventSystem` utilizando el método `subscribe`.
+            * Cuando se suscriben, se agregan a la lista de observadores en `AsyncEventSystem`.
+        3. Desencadenar Eventos:
+            * Se utiliza `trigger_event` para desencadenar eventos (clics y teclas) en el `AsyncEventSystem`.
+            * Los eventos se emiten a través del `Subject` que mantiene `AsyncEventSystem`.
+        4. Procesamiento Asíncrono:
+            * Debido a la naturaleza asíncrona de RxPy, se espera un tiempo para que los observadores procesen los eventos (usando `time.sleep(1)`).
+        5. Iteración sobre Observadores:
+            * Se utiliza el método `observers()` para obtener un iterador sobre la lista de observadores.
+            * Se itera sobre los observadores e imprime sus referencias.
+        6. Cancelación de Suscripciones:
+            * Se utilizan los métodos `dispose()` de las suscripciones para cancelar las suscripciones de los observadores.
+        7. Desencadenar Más Eventos:
+            * Se desencadenan más eventos después de que las suscripciones han sido canceladas para mostrar que nuevos observadores no recibirán eventos antiguos.
 
 
-### observers.rb
-```ruby
-# observers.rb
-
-class Catalog
-  def update(library, book)
-    puts "Se ha agregado un libro al catálogo: #{book.title} por #{book.author}"
-  end
-end
-
-class Notifications
-  def update(library, book)
-    puts "Has recibido una notificación sobre un nuevo libro: #{book.title}"
-  end
-end
-```
+    * **Cómo cumple con Observable = Observador + Iterable**:
+        * Observable (`AsyncEventSystem`):
+            * Emite eventos a través del método `trigger_event`.
+            * Permite a los observadores suscribirse y los mantiene en una lista interna.
+            * Proporciona un método `observers` que devuelve un iterador sobre la lista de observadores, cumpliendo con la parte "Iterable" de la ecuación.
+        * Observador (`ClickEventObserver`, `KeyEventObserver`):
+            * Implementa la interfaz `Observer`, permitiendo que el `AsyncEventSystem` los notifique cuando se emiten eventos.
+            * Se suscribe al `AsyncEventSystem` para recibir eventos.
+            * El método `on_next` maneja los eventos y realiza alguna acción.
 
 
-* Contiene las definiciones de las clases `Catalog` y `Notifications`, que son observadores interesados en cambios en la biblioteca.
-    * `Catalog` es una clase observadora que implementa un método `update`. Cuando se llama a este método, muestra un mensaje que indica que se ha agregado un libro al catálogo, incluyendo el título y el autor del libro.
-    * `Notifications` es otra clase observadora que implementa un método `update`. Cuando se llama a este método, muestra un mensaje de notificación sobre un nuevo libro, incluyendo el título del libro.
-
-
-### main.rb
-
-```ruby
-# main.rb
-
-require_relative 'book_library'
-require_relative 'observers'
-
-# Crea una instancia de la biblioteca y registra observadores.
-library = Library.new
-catalog_observer = Catalog.new
-notifications_observer = Notifications.new
-
-library.add_observer(catalog_observer)
-library.add_observer(notifications_observer)
-
-# Agrega libros a la biblioteca.
-book1 = Book.new("El Gran Gatsby", "F. Scott Fitzgerald")
-book2 = Book.new("Cien años de soledad", "Gabriel García Márquez")
-
-library.add_book(book1)
-library.add_book(book2)
-
-```
-
-
-* Contiene el código principal que crea instancias de las clases y ejecuta el programa. Requerimos los archivos `book_library.rb` y `observers.rb` para tener acceso a las clases definidas en ellos.
-    * Creamos una instancia de la `Library` (biblioteca) y dos instancias de observadores: `Catalog` y `Notifications`.
-    * Registramos los observadores con la biblioteca llamando a `library.add_observer(observer)`.
-    * Finalmente, agregamos dos libros a la biblioteca (`library.add_book(book1)` y `library.add_book(book2)`), lo que activa la notificación a los observadores.
-
+      En este diseño, la iterabilidad se logra a través de la lista de observadores en AsyncEventSystem. Aunque la iteración es explícita en este caso (a través de observers()), es una forma de cumplir con la idea de que Observable = Observador + Iterable.
 
 
 ### Ejecución del código
 Para ejecutar este código desde terminal, los pasos a seguir son:
-1. Asegurarse de tener Ruby instalado en el sistema.
-2. Tener los archivos `.rb` en el mismo directorio.
-3. Abrir una terminal que apunte al directorio que contiene los archivos.
+1. Asegurarse de tener Python instalado en el sistema y que está instalado RxPy (`pip install rx`).
+2. Tener el archivo `.py` en el mismo directorio.
+3. Abrir una terminal que apunte al directorio que contiene el archivo.
 4. Ejecutar el siguiente comando para ejecutar el código
 ```bash
-ruby main.rb
+python observable.py
 ```
 
 #### Resultado Esperado
 
-Cuando se ejecuta el programa el resultado que debemos obtener es:
+Las salidas pueden variar ligeramente dependiendo de la velocidad del sistema y la concurrencia, pero la estructura general debería ser la misma:
 ```bash
-Se ha agregado un libro al catálogo: El Gran Gatsby por F. Scott Fitzgerald
-Has recibido una notificación sobre un nuevo libro: El Gran Gatsby
-Se ha agregado un libro al catálogo: Cien años de soledad por Gabriel García Márquez
-Has recibido una notificación sobre un nuevo libro: Cien años de soledad
+Desencadenando evento de tipo click
+Manejando evento de clic: Botón izquierdo
+Desencadenando evento de tipo key
+Manejando evento de tecla: Tecla Enter
+Iterando sobre observadores:
+<__main__.ClickEventObserver object at 0x...>
+<__main__.KeyEventObserver object at 0x...>
+Desencadenando evento de tipo click
+Desencadenando evento de tipo key
+Manejando evento de clic: Botón derecho
+Manejando evento de tecla: Tecla Escape
 ```
+
+Este es un desglose de las líneas principales del resultado:
+
+1. Se desencadenan eventos de clic y tecla.
+2. Se imprime el manejo de eventos por parte de los observadores (clic y tecla).
+3. Se itera sobre los observadores y se imprime su referencia.
+4. Se desencadenan más eventos después de que las suscripciones han sido canceladas.
+5. Se imprime el manejo de eventos por parte de los nuevos observadores (que no reciben eventos antiguos).
 
 
 #### Resultado Obtenido
 
 Hacemos una ejecución en el que obtenemos el siguiente resultado:
 
-![Resultado de la ejecución del ejemplo](Imagen.png "Resultado")
+![Resultado de la ejecución del ejemplo](Resultado.png "Resultado")
